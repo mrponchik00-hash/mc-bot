@@ -9,7 +9,7 @@ http.createServer((req, res) => {
 
 const bot = mineflayer.createBot({
   host: 'Quantum-0nPx.aternos.me', 
-  port: 12345, // <--- ЗАМІНИ ЦІ ЦИФРИ НА СВІЙ ПОРТ З ATERNOS!
+  port: 21538, // <--- ЗАМІНИ ЦІ ЦИФРИ НА СВІЙ ПОРТ З ATERNOS!
   username: 'QuantumBot',
   version: '1.21.1' 
 })
