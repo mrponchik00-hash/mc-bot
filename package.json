@@ -1,6 +1,6 @@
 {
-  "name": "mc-bot-ultra",
-  "version": "1.1.0",
+  "name": "mc-bot-pro",
+  "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
