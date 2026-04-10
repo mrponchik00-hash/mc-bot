@@ -6,7 +6,7 @@ http.createServer((req, res) => res.end("OK")).listen(process.env.PORT || 3000);
 const botArgs = {
   host: 'Quantum-0nPx.aternos.me', 
   port: 21538,
-  username: 'QuantumBot', // Спробуй змінити нік, якщо цей забанили
+  username: 'supervenombot', // Спробуй змінити нік, якщо цей забанили
   version: '1.21.1',      // Вказуємо версію чітко
   hideErrors: false,
   checkTimeout: 90000,    // Збільшуємо час очікування
