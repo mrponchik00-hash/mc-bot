@@ -1,5 +1,5 @@
 {
-  "name": "mc-bot-24-7",
+  "name": "mc-bot",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -7,6 +7,5 @@
   },
   "dependencies": {
     "mineflayer": "^4.20.0"
-"
   }
 }
