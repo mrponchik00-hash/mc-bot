@@ -1,7 +1,11 @@
 {
-  "name": "mc-bot",
+  "name": "mc-bot-24-7",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": { "start": "node index.js" },
-  "dependencies": { "mineflayer": "latest" }
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "mineflayer": "latest"
+  }
 }
