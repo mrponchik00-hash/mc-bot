@@ -1,9 +1,9 @@
 const mineflayer = require('mineflayer')
 const http = require('http')
 
-// Веб-сервер для Cron-job (24/7 режим)
+// Моментальний запуск веб-сервера для стабільності на Render
 http.createServer((req, res) => {
-  res.write("Бот працює стабільно 24/7");
+  res.write("Bot status: Online");
   res.end();
 }).listen(process.env.PORT || 3000);
 
@@ -11,45 +11,35 @@ const options = {
   host: 'Quantum-0nPx.aternos.me', 
   port: 21538,
   username: 'QuantumBot',
-  version: false, // Авто-визначення версії сервера
-  checkTimeout: 60000, // Чекаємо відповіді 60 сек
-  hideErrors: false
+  version: '1.21.1', // Фіксована версія для миттєвого входу
+  connectTimeout: 10000
 }
 
-function startBot() {
+function initBot() {
   const bot = mineflayer.createBot(options)
 
-  // Обробка успішного входу
-  bot.on('spawn', () => {
-    console.log('✅ Бот успішно зайшов! Починаю AFK-цикл...');
+  bot.once('spawn', () => {
+    console.log('⚡ Бот у грі! Система стабілізації активована.');
     
-    // Кожні 2 хвилини робимо дію, щоб Essentials не кікав
-    if (bot.afkInterval) clearInterval(bot.afkInterval);
-    bot.afkInterval = setInterval(() => {
-      // Бот пише крапку в чат (це найнадійніше для Essentials)
-      bot.chat('/afk'); // Або просто bot.chat('.')
-      
-      // Також робимо мікро-стрибок
-      bot.setControlState('jump', true);
-      setTimeout(() => bot.setControlState('jump', false), 500);
-      
-      console.log('Виконано дію для запобігання AFK-кіку');
-    }, 120000); 
+    // Кожні 45 секунд бот робить мікро-стрибок та пише команду, щоб Essentials не кікав
+    setInterval(() => {
+      if (bot.entity) {
+        bot.setControlState('jump', true);
+        setTimeout(() => bot.setControlState('jump', false), 300);
+        bot.chat('/afk'); // Вимикає режим AFK у плагіні Essentials
+      }
+    }, 45000);
   });
 
-  // Помилки підключення
-  bot.on('error', (err) => {
-    console.log(`❌ Помилка: ${err.message}`);
-    if (err.message.includes('ECONNREFUSED')) {
-        console.log('Сервер вимкнено або перезавантажується...');
-    }
-  });
-
-  // Авто-рестарт при відключенні
+  // Обробка помилок без вильоту скрипта
+  bot.on('error', (err) => console.log('❌ Помилка:', err.message));
+  
+  // Миттєвий перезапуск при будь-якому відключенні
   bot.on('end', () => {
-    console.log('🔌 Зв’язок втрачено. Перезапуск через 15 секунд...');
-    setTimeout(startBot, 15000);
+    console.log('🔌 Перепідключення через 5 секунд...');
+    setTimeout(initBot, 5000);
   });
 }
 
-startBot();
+initBot();
+
