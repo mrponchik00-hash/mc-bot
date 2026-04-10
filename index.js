@@ -1,26 +1,48 @@
 const mineflayer = require('mineflayer')
 const http = require('http')
 
-// Веб-сервер, щоб хостинг не вимикав бота
+// Створюємо веб-сервер, щоб Render не вимикав бота (для 24/7 через UptimeRobot/Cron-job)
 http.createServer((req, res) => {
-  res.write("Bot is running!");
+  res.write("Bot is running 24/7!");
   res.end();
 }).listen(process.env.PORT || 3000);
 
-const bot = mineflayer.createBot({
+const botArgs = {
   host: 'Quantum-0nPx.aternos.me', 
-  port: 21538, // <--- ЗАМІНИ ЦІ ЦИФРИ НА СВІЙ ПОРТ З ATERNOS!
+  port: 21538,
   username: 'QuantumBot',
-  version: '1.21.1' 
-})
+  version: false, // Бот автоматично визначить версію сервера
+  checkTimeout: 30000
+}
 
-bot.on('spawn', () => {
-  console.log('✅ Бот успішно зайшов на сервер!');
-  setInterval(() => {
-    bot.setControlState('jump', true);
-    setTimeout(() => bot.setControlState('jump', false), 500);
-  }, 5000);
-})
+function createBot() {
+  const bot = mineflayer.createBot(botArgs)
 
-bot.on('error', err => console.log('Помилка:', err.message));
-bot.on('end', () => setTimeout(() => process.exit(), 5000));
+  bot.on('spawn', () => {
+    console.log('✅ Бот успішно зайшов на сервер!');
+    
+    // Постійний рух для AFK (стрибок + рух вперед)
+    setInterval(() => {
+      if (bot.entity) {
+        bot.setControlState('jump', true);
+        setTimeout(() => bot.setControlState('jump', false), 500);
+        
+        bot.setControlState('forward', true);
+        setTimeout(() => bot.setControlState('forward', false), 1000);
+      }
+    }, 5000);
+  })
+
+  // Повідомлення про помилки в консоль Render
+  bot.on('error', (err) => {
+    console.log('❌ Помилка:', err.message);
+  })
+
+  // Авто-перезапуск при вильоті з сервера
+  bot.on('end', () => {
+    console.log('🔌 Бот відключився. Перезапуск через 15 секунд...');
+    setTimeout(createBot, 15000);
+  })
+}
+
+createBot()
