@@ -1,45 +1,37 @@
 const mineflayer = require('mineflayer')
 const http = require('http')
 
-// Моментальний запуск веб-сервера для стабільності на Render
-http.createServer((req, res) => {
-  res.write("Bot status: Online");
-  res.end();
-}).listen(process.env.PORT || 3000);
+// Веб-сервер для Render
+http.createServer((req, res) => res.end("OK")).listen(process.env.PORT || 3000);
 
-const options = {
+const botArgs = {
   host: 'Quantum-0nPx.aternos.me', 
   port: 21538,
   username: 'QuantumBot',
-  version: '1.21.1', // Фіксована версія для миттєвого входу
-  connectTimeout: 10000
+  version: false, // Бот САМ запитає у сервера версію
+  checkTimeout: 60000,
+  hideErrors: false
 }
 
-function initBot() {
-  const bot = mineflayer.createBot(options)
+function start() {
+  const bot = mineflayer.createBot(botArgs)
 
   bot.once('spawn', () => {
-    console.log('⚡ Бот у грі! Система стабілізації активована.');
-    
-    // Кожні 45 секунд бот робить мікро-стрибок та пише команду, щоб Essentials не кікав
+    console.log('✅ Бот нарешті зайшов!');
     setInterval(() => {
-      if (bot.entity) {
-        bot.setControlState('jump', true);
-        setTimeout(() => bot.setControlState('jump', false), 300);
-        bot.chat('/afk'); // Вимикає режим AFK у плагіні Essentials
-      }
-    }, 45000);
+      bot.setControlState('jump', true);
+      setTimeout(() => bot.setControlState('jump', false), 500);
+    }, 10000);
   });
 
-  // Обробка помилок без вильоту скрипта
-  bot.on('error', (err) => console.log('❌ Помилка:', err.message));
-  
-  // Миттєвий перезапуск при будь-якому відключенні
+  bot.on('error', (err) => {
+    console.log('❌ ПОМИЛКА ТУТ:', err.message);
+  });
+
   bot.on('end', () => {
-    console.log('🔌 Перепідключення через 5 секунд...');
-    setTimeout(initBot, 5000);
+    console.log('🔌 Виліт. Перезапуск...');
+    setTimeout(start, 5000);
   });
 }
 
-initBot();
-
+start();
